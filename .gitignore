@@ -1,6 +1,5 @@
 # Composer files
 composer.phar
-vendor/
 
 # Local configs
 config/autoload/*.local.php
@@ -15,9 +14,6 @@ data/sessions/
 data/tmp/
 temp/
 
-#Doctrine 2
-data/DoctrineORMModule/Proxy/
-data/DoctrineORMModule/cache/
 
 # Legacy ZF1
 demos/
