@@ -12,19 +12,48 @@
         }
 
 
-        public function getCourseCodes()
+        public function getDepartments($keyword='')
         {
+            $keyword = trim($keyword);
+
+            $where  = '';
+            $params = [];
+            if ($keyword) {
+                $params[] = '%' . $keyword . '%';
+                $where    = " WHERE LOWER(department_code || ' ' || department_label_en) LIKE LOWER(?) ";
+            }
+
+            $filter = "SELECT department_code, department_label_en FROM departments d " . $where . " ORDER BY department_label_en ASC";
+            $rows   = $this->_db->fetchPairs($filter, $params);
+
+            return $rows;
+
+        }
+
+
+        public function getCourseCodes($keyword='')
+        {
+            $keyword = trim($keyword);
+
+            $where  = '';
+            $params = [];
+            if ($keyword) {
+                $params[] = '%' . $keyword . '%';
+                $where    = " WHERE LOWER((course_code || ' ' || course_number || ' - ' || course_label_en)) LIKE LOWER(?) ";
+            }
+
 
             $filter = "
                 SELECT (course_code || '' || course_number) AS course_key,
                        (course_code || ' ' || course_number || ' - ' || course_label_en) AS course_label
                   FROM 
                        courses d
+                   " . $where . " 
                  ORDER BY 
                           course_code ASC, course_number ASC
             ";
 
-            $rows = $this->_db->fetchPairs($filter);
+            $rows = $this->_db->fetchPairs($filter, $params);
 
             return $rows;
 
@@ -43,7 +72,10 @@
                     description_en,
                     (course_code || ' ' || course_number) AS course_shortname,
                     (course_code || '' || course_number) AS course_key,
-                    (course_code || ' ' || course_number || ' - ' || course_label_en) AS course_label
+                    (course_code || ' ' || course_number || ' - ' || course_label_en) AS course_label,
+                    department_code,
+                    department_label_en
+                    
                 FROM 
                      courses d
                 WHERE 
@@ -72,8 +104,8 @@
                    course_number,
                    course_label_en,
                    ects_credits,
-                   (course_code || ' ' || course_number) AS course_shortname,
                    (course_code || '' || course_number) AS course_key,
+                   (course_code || ' ' || course_number) AS course_shortname,
                    (course_code || ' ' || course_number || ' - ' || course_label_en) AS course_label
                FROM 
                     courses d

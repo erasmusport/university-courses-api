@@ -23,10 +23,21 @@
 
         switch ($job) {
 
-            case 'course-codes':
+            case 'departments':
+
+                $keyword = trim($_GET['keyword']);
 
                 $dataObj = new Data();
-                $results = $dataObj->getCourseCodes();
+                $results = $dataObj->getDepartments($keyword);
+
+                break;
+
+            case 'course-codes':
+
+                $keyword = trim($_GET['keyword']);
+
+                $dataObj = new Data();
+                $results = $dataObj->getCourseCodes($keyword);
 
                 break;
 
