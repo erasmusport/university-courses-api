@@ -59,6 +59,15 @@
 
                 break;
 
+            case 'student-curriculum-courses':
+
+                $studentId = trim($_GET['student-id']);
+
+                $dataObj = new Data();
+                $results = $dataObj->curriculumCourses($studentId);
+
+                break;
+
             default:
             case '':
                 throw new Exception('ERR105|Invalid job!');

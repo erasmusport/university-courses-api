@@ -128,4 +128,42 @@
         }
 
 
+        public function curriculumCourses($studentId)
+        {
+            if (!$studentId) {
+                return [];
+            }
+
+            $params   = [$studentId];
+
+            $filter = "
+               SELECT 
+                   course_code,
+                   course_number,
+                   course_label_en,
+                   ects_credits,
+                   (course_code || '' || course_number) AS course_key,
+                   (course_code || ' ' || course_number) AS course_shortname,
+                   (course_code || ' ' || course_number || ' - ' || course_label_en) AS course_label
+               FROM 
+                    student_curriculum sc
+               WHERE 
+                     sc.student_id = ?
+               ORDER BY 
+                    course_code ASC, course_number ASC
+            ";
+
+            $rows = $this->_db->fetchAll($filter, $params);
+
+            if (DEBUG) {
+                print_r($filter);
+                print_r($params);
+                print_r($rows);
+            }
+
+            return $rows;
+
+        }
+
+
     }
