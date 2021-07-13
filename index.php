@@ -23,6 +23,12 @@
 
         switch ($job) {
 
+            case 'version'://version of the API
+
+                $results = '202107141000';
+
+                break;
+
             case 'departments':
 
                 $keyword = trim($_GET['keyword']);
@@ -34,37 +40,41 @@
 
             case 'course-codes':
 
-                $keyword = trim($_GET['keyword']);
+                $keyword      = trim($_GET['keyword']);
+                $academicYear = trim($_GET['academic-year']);
 
                 $dataObj = new Data();
-                $results = $dataObj->getCourseCodes($keyword);
+                $results = $dataObj->getCourseCodes($keyword, $academicYear);
 
                 break;
 
             case 'course-info':
 
-                $code = trim($_GET['code']);
+                $code         = trim($_GET['code']);
+                $academicYear = trim($_GET['academic-year']);
 
                 $dataObj = new Data();
-                $results = $dataObj->getCourseInfo($code);
+                $results = $dataObj->getCourseInfo($code, $academicYear);
 
                 break;
 
             case 'search-courses':
 
-                $keyword = trim($_GET['keyword']);
+                $keyword      = trim($_GET['keyword']);
+                $academicYear = trim($_GET['academic-year']);
 
                 $dataObj = new Data();
-                $results = $dataObj->searchCourses($keyword);
+                $results = $dataObj->searchCourses($keyword, $academicYear);
 
                 break;
 
             case 'student-curriculum-courses':
 
-                $studentId = trim($_GET['student-id']);
+                $studentId    = trim($_GET['student-id']);
+                $academicYear = trim($_GET['academic-year']);
 
                 $dataObj = new Data();
-                $results = $dataObj->curriculumCourses($studentId);
+                $results = $dataObj->curriculumCourses($studentId, $academicYear);
 
                 break;
 
@@ -82,9 +92,9 @@
         $errorArr = explode('|', $e->getMessage());
 
         $res->res        = 0;
-        $res->msg        = $errorArr[0];
-        $res->error_code = $errorArr[0];
-        $res->error_msg  = $errorArr[1];
+        $res->msg        = trim($errorArr[0]);
+        $res->error_code = trim($errorArr[0]);
+        $res->error_msg  = trim($errorArr[1]);
 
         if (DEBUG) {
             $res->debug = print_r($e->getMessage(), true);

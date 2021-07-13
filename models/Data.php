@@ -12,18 +12,25 @@
         }
 
 
-        public function getDepartments($keyword='')
+        public function getDepartments($keyword = '')
         {
             $keyword = trim($keyword);
 
-            $where  = '';
-            $params = [];
+            $where       = [];
+            $params      = [];
+            $whereString = '';
+
             if ($keyword) {
+                //you can change this to a DBMS specific SQL code.
+                $where[]  = "LOWER(department_code || ' ' || department_label_en) LIKE LOWER(?)";
                 $params[] = '%' . $keyword . '%';
-                $where    = " WHERE LOWER(department_code || ' ' || department_label_en) LIKE LOWER(?) ";
             }
 
-            $filter = "SELECT department_code, department_label_en FROM departments d " . $where . " ORDER BY department_label_en ASC";
+            if ($where) {
+                $whereString = ' WHERE ' . (implode(' AND ', $where));
+            }
+
+            $filter = "SELECT department_code, department_label_en FROM departments d " . $whereString . " ORDER BY department_label_en ASC";
             $rows   = $this->_db->fetchPairs($filter, $params);
 
             return $rows;
@@ -31,24 +38,35 @@
         }
 
 
-        public function getCourseCodes($keyword='')
+        public function getCourseCodes($keyword = '', $academicYear = '')
         {
             $keyword = trim($keyword);
 
-            $where  = '';
-            $params = [];
+            $where       = [];
+            $params      = [];
+            $whereString = '';
+
             if ($keyword) {
+                //you can change this to a DBMS specific SQL code.
+                $where[]  = "LOWER((course_code || ' ' || course_number || ' - ' || course_label_en)) LIKE LOWER(?)";
                 $params[] = '%' . $keyword . '%';
-                $where    = " WHERE LOWER((course_code || ' ' || course_number || ' - ' || course_label_en)) LIKE LOWER(?) ";
             }
 
+            if ($academicYear) {
+                $where[]  = "academic_year = ?";
+                $params[] = $academicYear;
+            }
+
+            if ($where) {
+                $whereString = ' WHERE ' . (implode(' AND ', $where));
+            }
 
             $filter = "
                 SELECT (course_code || '' || course_number) AS course_key,
                        (course_code || ' ' || course_number || ' - ' || course_label_en) AS course_label
                   FROM 
                        courses d
-                   " . $where . " 
+                   " . $whereString . " 
                  ORDER BY 
                           course_code ASC, course_number ASC
             ";
@@ -60,8 +78,24 @@
         }
 
 
-        public function getCourseInfo($code)
+        public function getCourseInfo($code, $academicYear = '')
         {
+
+            $where       = [];
+            $params      = [];
+            $whereString = '';
+
+            $params[] = $code;
+
+            if ($academicYear) {
+                $where[]  = "academic_year = ?";
+                $params[] = $academicYear;
+            }
+
+            if ($where) {
+                $whereString = ' ' . (implode(' AND ', $where));
+            }
+
             $filter = "
                 SELECT 
                     course_code,
@@ -80,6 +114,8 @@
                      courses d
                 WHERE 
                       (course_code || '' || course_number) = ?
+                      " . $whereString . " 
+                      
                  ";
 
             $data = $this->_db->fetchRow($filter, array($code));
@@ -88,14 +124,26 @@
 
         }
 
-        public function searchCourses($keyword)
+        public function searchCourses($keyword, $academicYear = '')
         {
             if (!$keyword) {
                 return [];
             }
 
-            $params   = [];
+            $params      = [];
+            $where       = [];
+            $whereString = '';
+
             $params[] = '%' . $keyword . '%';
+
+            if ($academicYear) {
+                $where[]  = "academic_year = ?";
+                $params[] = $academicYear;
+            }
+
+            if ($where) {
+                $whereString = ' ' . (implode(' AND ', $where));
+            }
 
 
             $filter = "
@@ -111,6 +159,7 @@
                     courses d
                WHERE 
                      LOWER(course_code || ' ' || course_number || ' - ' || course_label_en) LIKE LOWER(?)
+                     " . $whereString . "
                ORDER BY 
                         course_code ASC, course_number ASC
             ";
@@ -128,13 +177,26 @@
         }
 
 
-        public function curriculumCourses($studentId)
+        public function curriculumCourses($studentId, $academicYear = '')
         {
             if (!$studentId) {
                 return [];
             }
 
-            $params   = [$studentId];
+            $params      = [$studentId];
+            $where       = [];
+            $whereString = '';
+
+
+            if ($academicYear) {
+                $where[]  = "academic_year = ?";
+                $params[] = $academicYear;
+            }
+
+            if ($where) {
+                $whereString = ' ' . (implode(' AND ', $where));
+            }
+
 
             $filter = "
                SELECT 
@@ -149,6 +211,7 @@
                     student_curriculum sc
                WHERE 
                      sc.student_id = ?
+                     " . $whereString . "
                ORDER BY 
                     course_code ASC, course_number ASC
             ";
