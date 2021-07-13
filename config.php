@@ -18,7 +18,6 @@
         $config['db']['params']['dbname']                          = 'xyz_dbname';
         $config['db']['params']['options']['caseFolding']          = 2;
         $config['db']['params']['options']['autoQuoteIdentifiers'] = false;
-        $config['db']['params']['options']['caseFolding']          = 2;
         //$config['db']['params']['charset'] = '';
         //$config['db']['params']['options']['persistent'] = true;
 
