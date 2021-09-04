@@ -2,6 +2,10 @@
 
     try {
 
+        if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
+            throw new Exception('Restricted access. SEC401');
+        };
+
         define('ADMIN_EMAIL', 'xyz@uni.edu');
 
         set_include_path('./vendor/ZendFramework/1.12.20-custom/');
